@@ -20,3 +20,7 @@ sync/
 
 # 语言模型文件
 *.gram
+
+# 自动生成的lua文件
+lua/input_stats.lua
+
