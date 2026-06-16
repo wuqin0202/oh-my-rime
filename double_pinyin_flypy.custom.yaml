@@ -3,7 +3,15 @@ patch:
   "grammar/collocation_max_length": 5
   "grammar/collocation_min_length": 2
 
+  # 不展开双拼为完整拼音（显示原始编码如 jk 而非 jing）
+  "translator/preedit_format": []
+
   # translator 内加载
   "translator/contextual_suggestions": true
   "translator/max_homophones": 7
   "translator/max_homographs": 7
+
+  # 模糊音: in ↔ ing
+  "speller/algebra/+":
+    - derive/^(.+)in$/$1ing/
+    - derive/^(.+)ing$/$1in/

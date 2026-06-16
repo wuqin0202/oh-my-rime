@@ -1,4 +1,7 @@
 patch:
+  # 取消 Ctrl+` 和 Ctrl+Shift+` 的方案切换快捷键
+  "switcher/hotkeys": []
+
   schema_list:
     - schema: double_pinyin_flypy
     - schema: rime_mint
