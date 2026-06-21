@@ -1,0 +1,16 @@
+{
+  "remote_root": "nutstore-rime:RimeUserDBSync",
+  "device_id": "mac-squirrel",
+  "rime_user_dir": "~/Library/Rime",
+  "local_sync_dir": "~/Library/Rime/.sync",
+  "rclone_binary": "rclone",
+  "rime_sync_command": [
+    "/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel",
+    "--sync"
+  ],
+  "include_patterns": [
+    "*.userdb.txt"
+  ],
+  "interval_minutes": 60,
+  "android_allow_push": false
+}

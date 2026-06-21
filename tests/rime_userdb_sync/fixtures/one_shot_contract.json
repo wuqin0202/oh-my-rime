@@ -1,0 +1,28 @@
+{
+  "phase_order": [
+    "validate",
+    "pull",
+    "merge",
+    "push"
+  ],
+  "failure_expectations": {
+    "merge_failure": {
+      "push_allowed": false
+    },
+    "pull_failure": {
+      "merge_allowed": false,
+      "push_allowed": false
+    },
+    "push_failure": {
+      "local_merged_state_preserved": true
+    },
+    "lock_contention": {
+      "concurrent_run_blocked": true
+    }
+  },
+  "manual_one_shot": {
+    "supported": true,
+    "dry_run_supported": true,
+    "mode": "explicit-user-invocation"
+  }
+}
