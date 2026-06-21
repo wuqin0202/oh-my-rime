@@ -23,3 +23,4 @@ sync/
 lua/input_stats.lua
 
 *.bak*
+.omx
