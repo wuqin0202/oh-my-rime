@@ -525,6 +525,69 @@ RimeUserDBSync/
 
 - `tools/rime-userdb-sync/examples/README.md`
 
+### 16.1 macOS LaunchAgent 注意事项
+
+macOS 上不建议让 LaunchAgent 直接从 `~/Desktop`、`~/Documents` 或这些目录下的仓库路径执行同步脚本。原因是 launchd 启动的后台进程可能没有对应目录的隐私权限，常见报错是：
+
+```text
+Operation not permitted
+```
+
+推荐做法：
+
+1. 把工具脚本和本机配置复制到用户库目录：
+
+```bash
+mkdir -p "$HOME/Library/Application Support/rime-userdb-sync"
+mkdir -p "$HOME/Library/Logs/rime-userdb-sync"
+cp tools/rime-userdb-sync/*.py "$HOME/Library/Application Support/rime-userdb-sync/"
+cp /path/to/config.json "$HOME/Library/Application Support/rime-userdb-sync/config.json"
+```
+
+2. 让 plist 执行这个目录里的入口：
+
+```text
+~/Library/Application Support/rime-userdb-sync/cli.py
+```
+
+3. 在 macOS LaunchAgent 场景下，`PATH` 通常只有：
+
+```text
+/usr/bin:/bin:/usr/sbin:/sbin
+```
+
+所以配置里的 `rclone_binary` 推荐写绝对路径，例如：
+
+```json
+{
+  "rclone_binary": "/opt/homebrew/bin/rclone"
+}
+```
+
+4. 如果 `~/Library/Rime` 本身是指向 `~/Desktop/...` 的符号链接，LaunchAgent 读取 `installation.yaml` 时仍可能被 macOS 隐私权限拦截。遇到这种情况时，可选处理方式是：
+
+- 使用已经具备访问权限的 Python 解释器，例如用户自己的 Python 环境
+- 给对应 Python/终端授予 Full Disk Access
+- 或者把 Rime 目录迁出 Desktop / Documents 等受保护目录
+
+手动触发并检查：
+
+```bash
+launchctl kickstart -k gui/$(id -u)/com.rime-userdb-sync
+launchctl print gui/$(id -u)/com.rime-userdb-sync | grep -E 'state =|runs =|last exit code ='
+tail -120 "$HOME/Library/Logs/rime-userdb-sync/stdout.log"
+tail -120 "$HOME/Library/Logs/rime-userdb-sync/stderr.log"
+```
+
+一次成功的 one-shot 同步通常会显示：
+
+```text
+state = not running
+last exit code = 0
+```
+
+`state = not running` 对 one-shot 定时任务是正常的；关键是 `last exit code = 0`，以及 stdout 日志里能看到 `pull`、`merge`、`push`、`sync complete`。
+
 ---
 
 ## 17. 当前实现与文档的已知差异

@@ -47,7 +47,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>__PYTHON_BIN__</Command>
-      <Arguments>__REPO_ROOT__\tools\rime-userdb-sync\main.py --config __CONFIG_PATH__ sync</Arguments>
+      <Arguments>__REPO_ROOT__\tools\rime-userdb-sync\cli.py sync --config __CONFIG_PATH__</Arguments>
       <WorkingDirectory>__WORKING_DIR__</WorkingDirectory>
     </Exec>
   </Actions>

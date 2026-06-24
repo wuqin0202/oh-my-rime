@@ -6,5 +6,5 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=__WORKING_DIR__
-ExecStart=__PYTHON_BIN__ __REPO_ROOT__/tools/rime-userdb-sync/main.py --config __CONFIG_PATH__ sync
+ExecStart=__PYTHON_BIN__ __REPO_ROOT__/tools/rime-userdb-sync/cli.py sync --config __CONFIG_PATH__
 Nice=10

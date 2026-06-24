@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 
 Set-Location -Path $WorkingDirectory
 
-$mainScript = Join-Path $RepoRoot "tools/rime-userdb-sync/main.py"
+$mainScript = Join-Path $RepoRoot "tools/rime-userdb-sync/cli.py"
 $arguments = @(
     $mainScript,
     "--config",
