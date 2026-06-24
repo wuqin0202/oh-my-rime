@@ -24,3 +24,7 @@ lua/input_stats.lua
 
 *.bak*
 .omx
+
+# Python 缓存文件
+__pycache__/
+*.py[cod]

@@ -1,11 +1,10 @@
 [Unit]
-Description=Run Rime UserDB Sync every 30 minutes
+Description=Run Rime UserDB Sync daily at 02:00
 
 [Timer]
-OnBootSec=5m
-OnUnitActiveSec=30m
+OnCalendar=*-*-* 02:00:00
+AccuracySec=1min
 Unit=rime-userdb-sync.service
-Persistent=true
 
 [Install]
 WantedBy=timers.target

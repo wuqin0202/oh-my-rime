@@ -5,12 +5,11 @@
   "local_sync_dir": "~/.local/share/fcitx5/rime/.sync",
   "rclone_binary": "rclone",
   "rime_sync_command": [
-    "rime_dict_manager",
-    "--sync"
+    "/home/wuqin/Workspace/oh-my-rime/tools/rime-userdb-sync/examples/linux/fcitx5-rime-sync-wrapper.sh"
   ],
   "include_patterns": [
     "*.userdb.txt"
   ],
-  "interval_minutes": 60,
+  "interval_minutes": 1440,
   "android_allow_push": false
 }

@@ -131,6 +131,13 @@ systemctl --user daemon-reload
 systemctl --user enable --now rime-userdb-sync.timer
 ```
 
+Linux/Fcitx5 注意事项：
+
+- 默认 timer 只在每天 02:00 触发，不设置开机补跑，避免白天输入法使用高峰期
+- 如果 `rime_sync_command` 直接写 `rime_dict_manager --sync`，运行中的 Fcitx5 可能持有 `*.userdb/LOCK`，导致 merge 失败
+- 推荐把 Linux 配置中的 `rime_sync_command` 指向 `tools/rime-userdb-sync/examples/linux/fcitx5-rime-sync-wrapper.sh` 的绝对路径
+- wrapper 会在 merge 前短暂请求 Fcitx5 退出，等待锁释放，merge 完成后自动恢复 Fcitx5
+
 说明：
 
 - `.service` 定义“执行什么命令”

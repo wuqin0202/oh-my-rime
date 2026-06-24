@@ -158,11 +158,21 @@ WeaselDeployer.exe /sync
 
 #### Linux Fcitx5 Rime
 
-优先：
+如果没有运行中的 Fcitx5，可以直接使用：
 
 ```bash
 rime_dict_manager --sync
 ```
+
+如果 Fcitx5 正在运行，推荐通过 Linux wrapper 间接执行，避免和 Fcitx5 持有的 `*.userdb/LOCK` 冲突：
+
+```json
+"rime_sync_command": [
+  "/path/to/tools/rime-userdb-sync/examples/linux/fcitx5-rime-sync-wrapper.sh"
+]
+```
+
+该 wrapper 会在 merge 前短暂请求 Fcitx5 退出，等待 userdb 锁释放，执行 `rime_dict_manager --sync`，最后自动恢复 Fcitx5。
 
 备选：
 
@@ -312,6 +322,7 @@ python3 tools/rime-userdb-sync/cli.py sync \
 - 非 Android 平台如果没有 `rime_sync_command`，会直接报错
 - 如果 merge 命令失败，不会执行上传
 - 如果远端列举或下载失败，整个流程中止
+- Linux/Fcitx5 下，运行中的 Fcitx5 可能持有 `*.userdb/LOCK`；后台定时任务建议使用 `examples/linux/fcitx5-rime-sync-wrapper.sh` 包装本地 merge 命令
 
 ---
 
