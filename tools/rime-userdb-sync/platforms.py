@@ -13,11 +13,6 @@ import platform as host_platform
 from typing import Mapping, Optional
 
 
-ANDROID_USER_DIR = Path(
-    "/storage/emulated/0/Android/data/org.fcitx.fcitx5.android/files/data/rime"
-)
-
-
 @dataclass(frozen=True)
 class PlatformSpec:
     """Resolved platform metadata used by the sync engine."""
@@ -38,10 +33,8 @@ def detect_platform(
     - macos
     - windows
     - linux
-    - android
     """
 
-    env = environment or os.environ
     raw_system = (system or host_platform.system()).strip().lower()
 
     if raw_system == "darwin":
@@ -49,8 +42,6 @@ def detect_platform(
     if raw_system == "windows":
         return "windows"
     if raw_system == "linux":
-        if env.get("ANDROID_ROOT") or env.get("ANDROID_STORAGE"):
-            return "android"
         return "linux"
     raise ValueError(f"Unsupported platform: {system or host_platform.system()!r}")
 
@@ -75,8 +66,6 @@ def default_rime_user_dir(
         return base_home / "AppData" / "Roaming" / "Rime"
     if platform_name == "linux":
         return base_home / ".local" / "share" / "fcitx5" / "rime"
-    if platform_name == "android":
-        return ANDROID_USER_DIR
     raise ValueError(f"Unsupported platform: {platform_name!r}")
 
 

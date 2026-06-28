@@ -11,6 +11,5 @@
   "include_patterns": [
     "*.userdb.txt"
   ],
-  "interval_minutes": 60,
-  "android_allow_push": false
+  "interval_minutes": 60
 }

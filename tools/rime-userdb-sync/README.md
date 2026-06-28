@@ -87,14 +87,12 @@ pull-all -> merge-local -> push-own-only
 - `darwin`
 - `windows`
 - `linux`
-- `android`
 
 默认 Rime 用户目录：
 
 - macOS：`~/Library/Rime`
 - Windows：`%APPDATA%\\Rime`
 - Linux：`~/.local/share/fcitx5/rime`
-- Android：`/storage/emulated/0/Android/data/org.fcitx.fcitx5.android/files/data/rime`
 
 如果实际路径不同，可以通过配置文件或 CLI 参数覆盖。
 
@@ -140,7 +138,7 @@ nutstore-rime:
 
 ### 5.4 本机 Rime 同步命令
 
-非 Android 平台必须提供本机可执行的 Rime 同步命令。
+必须提供本机可执行的 Rime 同步命令。
 
 常见示例：
 
@@ -180,10 +178,6 @@ rime_dict_manager --sync
 rime_dict_manager -s
 ```
 
-#### Android
-
-Android 默认不要求自动 merge 命令。它按半自动流程工作。
-
 ---
 
 ## 6. 配置文件
@@ -205,9 +199,8 @@ Android 默认不要求自动 merge 命令。它按半自动流程工作。
 | `rime_sync_command` | 本机 Rime merge 命令，可写成字符串或字符串数组 |
 | `rclone_binary` | `rclone` 可执行文件名或绝对路径 |
 | `include_patterns` | 默认只需要 `["*.userdb.txt"]` |
-| `platform_override` | 手动指定平台：`darwin/windows/linux/android` |
+| `platform_override` | 手动指定平台：`darwin/windows/linux` |
 | `interval_minutes` | 当前实现会读取，但是否实际被调度器使用取决于你的外部调度方式 |
-| `android_allow_push` | Android 场景下是否允许显式 push |
 
 ### 6.2 推荐配置示例
 
@@ -225,8 +218,7 @@ Android 默认不要求自动 merge 命令。它按半自动流程工作。
   "include_patterns": [
     "*.userdb.txt"
   ],
-  "interval_minutes": 60,
-  "android_allow_push": false
+  "interval_minutes": 60
 }
 ```
 
@@ -319,7 +311,7 @@ python3 tools/rime-userdb-sync/cli.py sync \
 
 ### 9.3 重要限制
 
-- 非 Android 平台如果没有 `rime_sync_command`，会直接报错
+- 如果没有 `rime_sync_command`，会直接报错
 - 如果 merge 命令失败，不会执行上传
 - 如果远端列举或下载失败，整个流程中止
 - Linux/Fcitx5 下，运行中的 Fcitx5 可能持有 `*.userdb/LOCK`；后台定时任务建议使用 `examples/linux/fcitx5-rime-sync-wrapper.sh` 包装本地 merge 命令
@@ -419,43 +411,9 @@ python3 tools/rime-userdb-sync/cli.py push \
 
 ---
 
-## 13. Android 半自动流程
+## 13. 锁文件与日志
 
-Android 不支持桌面端那种完整自动化。
-
-当前建议流程：
-
-### 13.1 第一步：前台 pull / validate / dry-run
-
-```bash
-python3 tools/rime-userdb-sync/cli.py sync \
-  --config /path/to/android-config.json \
-  --platform android \
-  --dry-run
-```
-
-### 13.2 第二步：用户手动完成本地 merge
-
-由用户在 Android 端自己确认 Rime merge 已完成。
-
-### 13.3 第三步：显式 push
-
-```bash
-python3 tools/rime-userdb-sync/cli.py push \
-  --config /path/to/android-config.json \
-  --platform android
-```
-
-注意：
-
-- Android 不提供 scheduler 示例
-- Android 不提供后台静默自动同步
-
----
-
-## 14. 锁文件与日志
-
-### 14.1 锁文件
+### 13.1 锁文件
 
 当前实现会在：
 
@@ -465,7 +423,7 @@ python3 tools/rime-userdb-sync/cli.py push \
 
 创建锁文件。
 
-### 14.2 stale lock
+### 13.2 stale lock
 
 如果发现旧锁，可以显式允许清理：
 
@@ -475,7 +433,7 @@ python3 tools/rime-userdb-sync/cli.py sync \
   --cleanup-stale-lock
 ```
 
-### 14.3 日志
+### 13.3 日志
 
 正常非 dry-run 时，日志会写到：
 
@@ -495,7 +453,7 @@ python3 tools/rime-userdb-sync/cli.py sync \
 
 ---
 
-## 15. 远端目录约定
+## 14. 远端目录约定
 
 远端必须是共享根目录，例如：
 
@@ -522,7 +480,7 @@ RimeUserDBSync/
 
 ---
 
-## 16. 调度器示例
+## 15. 调度器示例
 
 调度器示例放在：
 
@@ -536,7 +494,7 @@ RimeUserDBSync/
 
 - `tools/rime-userdb-sync/examples/README.md`
 
-### 16.1 macOS LaunchAgent 注意事项
+### 15.1 macOS LaunchAgent 注意事项
 
 macOS 上不建议让 LaunchAgent 直接从 `~/Desktop`、`~/Documents` 或这些目录下的仓库路径执行同步脚本。原因是 launchd 启动的后台进程可能没有对应目录的隐私权限，常见报错是：
 
@@ -601,7 +559,7 @@ last exit code = 0
 
 ---
 
-## 17. 当前实现与文档的已知差异
+## 16. 当前实现与文档的已知差异
 
 为了避免误解，这里明确两点：
 
@@ -615,7 +573,7 @@ python3 tools/rime-userdb-sync/cli.py
 
 ---
 
-## 18. 推荐使用顺序
+## 17. 推荐使用顺序
 
 建议按这个顺序使用：
 
@@ -673,11 +631,7 @@ python3 tools/rime-userdb-sync/cli.py sync \
 
 这是刻意设计的。工具只做同步，不接管凭据配置。
 
-### Q3：为什么 Android 没有定时器示例？
-
-因为当前设计明确规定 Android 只支持半自动流程。
-
-### Q4：为什么 tests 通过了，但还不能说完全可用了？
+### Q3：为什么 tests 通过了，但还不能说完全可用了？
 
 因为当前通过的是：
 

@@ -13,7 +13,7 @@ from typing import Any, Sequence
 
 from filtering import DEFAULT_INCLUDE_PATTERNS, collect_local_snapshots, is_allowed_snapshot
 
-SUPPORTED_PLATFORMS = {"darwin", "windows", "linux", "android"}
+SUPPORTED_PLATFORMS = {"darwin", "windows", "linux"}
 INSTALLATION_FIELD_ORDER = [
     "distribution_code_name",
     "distribution_name",
@@ -41,7 +41,6 @@ class ToolConfig:
     include_patterns: list[str] = field(default_factory=lambda: list(DEFAULT_INCLUDE_PATTERNS))
     platform_override: str | None = None
     interval_minutes: int | None = None
-    android_allow_push: bool = False
 
 
 @dataclass
@@ -149,8 +148,6 @@ def detect_platform(override: str | None = None) -> str:
         if normalized not in SUPPORTED_PLATFORMS:
             raise SyncToolError(f"unsupported platform override: {override}")
         return normalized
-    if os.environ.get("ANDROID_ROOT") or os.environ.get("ANDROID_DATA"):
-        return "android"
     if sys.platform.startswith("darwin"):
         return "darwin"
     if sys.platform.startswith("win"):
@@ -166,8 +163,6 @@ def default_rime_user_dir(platform_name: str) -> Path:
         if not appdata:
             raise SyncToolError("APPDATA is required to resolve the Weasel user directory")
         return Path(appdata) / "Rime"
-    if platform_name == "android":
-        return Path("/storage/emulated/0/Android/data/org.fcitx.fcitx5.android/files/data/rime")
     return Path("~/.local/share/fcitx5/rime").expanduser()
 
 
@@ -210,7 +205,6 @@ def build_tool_config(config_data: dict[str, Any], cli_overrides: dict[str, Any]
         include_patterns=[str(pattern) for pattern in include_patterns],
         platform_override=merged.get("platform_override"),
         interval_minutes=int(interval) if interval is not None else None,
-        android_allow_push=bool(merged.get("android_allow_push", False)),
     )
 
 
@@ -393,10 +387,7 @@ def pull_remote_snapshots(runner: SubprocessRunner, ctx: RuntimeContext, logger:
 
 def run_local_merge(runner: SubprocessRunner, ctx: RuntimeContext, logger: StructuredLogger, *, dry_run: bool) -> bool:
     if not ctx.rime_sync_command:
-        if ctx.platform_name == "android":
-            logger.emit("merge", "invoke", "skip", reason="android_manual_merge_required")
-            return False
-        raise SyncToolError("rime_sync_command is required for non-Android sync; set it via config or CLI")
+        raise SyncToolError("rime_sync_command is required; set it via config or CLI")
     logger.emit("merge", "invoke", "ok" if not dry_run else "skip", dry_run=dry_run)
     if dry_run:
         return True
@@ -437,14 +428,8 @@ def sync_once(config: ToolConfig, *, dry_run: bool, cleanup_stale_lock: bool, ru
     logger.emit("lock", "acquire", "ok" if not dry_run else "skip", dry_run=dry_run)
     try:
         pulled = pull_remote_snapshots(runner, ctx, logger, dry_run=dry_run)
-        merged = run_local_merge(runner, ctx, logger, dry_run=dry_run)
-        pushed: list[str] = []
-        if ctx.platform_name == "android" and not merged and not config.android_allow_push:
-            logger.emit("push", "gate", "skip", reason="android_requires_manual_merge_then_explicit_push")
-        else:
-            if ctx.platform_name == "android" and not merged and config.android_allow_push:
-                raise SyncToolError("android push requires a successful merge in the same invocation or explicit push command")
-            pushed = push_current_device_snapshots(runner, ctx, logger, dry_run=dry_run)
+        run_local_merge(runner, ctx, logger, dry_run=dry_run)
+        pushed = push_current_device_snapshots(runner, ctx, logger, dry_run=dry_run)
         logger.emit("sync", "complete", "ok", pulled=len(pulled), pushed=len(pushed), dry_run=dry_run)
         return {
             "platform": ctx.platform_name,

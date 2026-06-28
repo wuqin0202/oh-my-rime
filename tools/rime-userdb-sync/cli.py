@@ -27,7 +27,6 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_arguments(sync_parser)
     sync_parser.add_argument("--dry-run", action="store_true", help="Report planned actions without mutating local or remote state.")
     sync_parser.add_argument("--cleanup-stale-lock", action="store_true", help="Allow explicit stale-lock cleanup.")
-    sync_parser.add_argument("--android-allow-push", action="store_true", help="Allow Android push after a successful user-provided merge command.")
 
     push_parser = subparsers.add_parser("push", help="Push only the current device snapshots after a manual merge.")
     add_common_arguments(push_parser)
@@ -49,7 +48,7 @@ def add_common_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--local-sync-dir", help="Explicit local .sync directory override.")
     parser.add_argument("--rime-sync-command", help="Explicit local Rime sync command.")
     parser.add_argument("--rclone-binary", help="rclone executable name or path.")
-    parser.add_argument("--platform", dest="platform_override", help="Force platform detection to darwin/windows/linux/android.")
+    parser.add_argument("--platform", dest="platform_override", help="Force platform detection to darwin/windows/linux.")
 
 
 def collect_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
@@ -61,7 +60,6 @@ def collect_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "rime_sync_command": args.rime_sync_command,
         "rclone_binary": args.rclone_binary,
         "platform_override": args.platform_override,
-        "android_allow_push": getattr(args, "android_allow_push", None),
     }
 
 
