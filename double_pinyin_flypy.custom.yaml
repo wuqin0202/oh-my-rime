@@ -13,10 +13,10 @@ patch:
   "translator/max_homophones": 7
   "translator/max_homographs": 7
 
-  # 模糊音: in ↔ ing
+  # 模糊音: in ↔ ing（小鹤双拼韵母编码分别为 b、k）
   "speller/algebra/+":
-    - derive/^(.+)in$/$1ing/
-    - derive/^(.+)ing$/$1in/
+    - derive/^(.+)b$/$1k/
+    - derive/^(.+)k$/$1b/
 
   # 不展开双拼为完整拼音（显示原始编码如 jk 而非 jing）
   "translator/preedit_format": []

@@ -6,6 +6,10 @@ patch:
     - schema: double_pinyin_flypy
     - schema: rime_mint
 
+  # 中英切换时提交当前输入编码（如 ni），而不是提交首选候选词（如“你”）
+  "ascii_composer/switch_key/Shift_L": commit_code
+  "ascii_composer/switch_key/Shift_R": commit_code
+
   key_binder:
     bindings:
       # Emacs 风格的快捷键

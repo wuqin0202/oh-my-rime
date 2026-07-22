@@ -1,0 +1,5 @@
+patch:
+  # 模糊音: in ↔ ing
+  "speller/algebra/+":
+    - derive/^(.*)in$/$1ing/
+    - derive/^(.*)ing$/$1in/
